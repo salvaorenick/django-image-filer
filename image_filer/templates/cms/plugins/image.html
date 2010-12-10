@@ -1,4 +1,14 @@
 {% load thumbnail %}
+{# {% if link %}<a href="{{ link }}">{% endif %} #}
+{# <img {% if object.float %}class="{{ object.float }}" {% endif %}alt="{% if object.alt %}{{ object.alt }}{% endif %}" src="{% thumbnail object.image image_size %}" /> #}
+{# {% if link %}</a>{% endif %} #}
+
+{% if picture.float %}<span class="callout callout-{{ picture.float }}">{% endif %}
 {% if link %}<a href="{{ link }}">{% endif %}
-<img {% if object.float %}class="{{ object.float }}" {% endif %}alt="{% if object.alt %}{{ object.alt }}{% endif %}" src="{% thumbnail object.image image_size %}" />
+{% thumbnail picture.image image_size as img %}
+<img alt="{{ picture.alt }}" src="{{ img }}" />
+{% if picture.caption %}
+<span class="caption">{{ picture.caption }}</span>
+{% endif %}
 {% if link %}</a>{% endif %}
+{% if picture.float %}</span>{% endif %}

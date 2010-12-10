@@ -19,6 +19,7 @@ class ImageFilerImageWidget(ForeignKeyRawIdWidget):
         css_id = attrs.get('id', 'id_image_x')
         css_id_thumbnail_img = "%s_thumbnail_img" % css_id
         css_id_description_txt = "%s_description_txt" % css_id
+        inline_class  = "filer"
         if attrs is None:
             attrs = {}
         related_url = reverse('admin:image_filer-directory_listing-root')
@@ -32,20 +33,20 @@ class ImageFilerImageWidget(ForeignKeyRawIdWidget):
         output = []
         if obj:
             try:
-                output.append(u'<img id="%s" src="%s" alt="%s" /> ' % (css_id_thumbnail_img, obj.thumbnails['admin_tiny_icon'], obj.label) )
+                output.append(u'<img id="%s" src="%s" alt="%s" class="%s" /> ' % (css_id_thumbnail_img, obj.thumbnails['admin_tiny_icon'], obj.label, inline_class) )
             except ThumbnailException:
                 # this means that the image is missing on the filesystem
-                output.append(u'<img id="%s" src="%s" alt="%s" /> ' % (css_id_thumbnail_img, '', 'image missing!') )
-            output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, obj) )
+                output.append(u'<img id="%s" src="%s" alt="%s" class="%s" /> ' % (css_id_thumbnail_img, '', 'image missing!', inline_class) )
+            output.append(u'&nbsp;<strong id="%s" class="%s">%s</strong>' % (css_id_description_txt, inline_class, obj) )
         else:
-            output.append(u'<img id="%s" src="" class="quiet" alt="no image selected">' % css_id_thumbnail_img)
-            output.append(u'&nbsp;<strong id="%s">%s</strong>' % (css_id_description_txt, '') )
+            output.append(u'<img id="%s" src="" class="quiet %s" alt="no image selected">' % (css_id_thumbnail_img, inline_class))
+            output.append(u'&nbsp;<strong id="%s" class="%s">%s</strong>' % (css_id_description_txt, inline_class, '') )
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
-        output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
-            (related_url, url, name))
-        output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s" /></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Lookup')))
-        output.append('''<a href="" class="deletelink" onclick="return removeImageLink('%s');">&nbsp;</a>''' % (css_id,) )
+        output.append('<a href="%s%s" class="related-lookup %s" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
+            (related_url, url, inline_class, name))
+        output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="%s"  class="%s"/></a>' % (settings.ADMIN_MEDIA_PREFIX, _('Lookup'), inline_class))
+        output.append('''<a href="" class="deletelink %s" onclick="return removeImageLink('%s');">&nbsp;</a>''' % (inline_class, css_id,) )
         output.append('</br>')
         super_attrs = attrs.copy()
         output.append( super(ForeignKeyRawIdWidget, self).render(name, value, super_attrs) )
@@ -63,7 +64,8 @@ class ImageFilerImageWidget(ForeignKeyRawIdWidget):
     
     class Media:
         js = (context_processors.media(None)['IMAGE_FILER_MEDIA_URL']+'js/image_widget_thumbnail.js',
-              context_processors.media(None)['IMAGE_FILER_MEDIA_URL']+'js/popup_handling.js',)
+              context_processors.media(None)['IMAGE_FILER_MEDIA_URL']+'js/popup_handling.js',
+              context_processors.media(None)['IMAGE_FILER_MEDIA_URL']+'js/image-filer-fix.js',)
 
 class ImageFilerImageFormField(forms.ModelChoiceField):
     widget = ImageFilerImageWidget 
